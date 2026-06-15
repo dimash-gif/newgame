@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Vigilant Sovereign: Cyber-Defense Realm</title>
+    <!-- Google Fonts for retro arcade and medieval styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Phaser JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+</head>
+<body class="theme-neon-city">
+    <!-- Tutorial Overlay Modal -->
+    <div id="tutorialOverlay" class="tutorial-overlay hidden">
+        <div class="tutorial-modal">
+            <div class="tutorial-modal-header">
+                <div class="tutorial-modal-title" id="tutorialTitle">HOW TO PLAY</div>
+                <div class="tutorial-modal-subtitle" id="tutorialSubtitle">Royal Security Officer Training Manual</div>
+            </div>
+
+            <div class="tutorial-steps">
+                <div class="tutorial-step">
+                    <div class="step-number">1</div>
+                    <div class="step-title" id="tutStep1Title"><span class="step-icon">🔍</span> Inspect</div>
+                    <div class="step-desc" id="tutStep1Desc">Use your <strong>Security Tools</strong> (Truth Lens, Magic Scale, Cryptographer) to reveal hidden information about each caravan. Look for mismatches between claimed and actual values.</div>
+                </div>
+                <div class="tutorial-step">
+                    <div class="step-number">2</div>
+                    <div class="step-title" id="tutStep2Title"><span class="step-icon">⚖️</span> Analyze</div>
+                    <div class="step-desc" id="tutStep2Desc">Compare the <strong>Claimed Sender</strong> with the <strong>Real Source</strong>. Check if the seal is valid. If values say MISMATCH or the route is EXTERNAL — it's likely a threat!</div>
+                </div>
+                <div class="tutorial-step">
+                    <div class="step-number">3</div>
+                    <div class="step-title" id="tutStep3Title"><span class="step-icon">✅</span> Decide</div>
+                    <div class="step-desc" id="tutStep3Desc">Choose your action: <strong>Allow</strong> safe caravans to boost Economy, or <strong>Deny & Report</strong> threats. Wrong decisions cost Health or Economy!</div>
+                </div>
+                <div class="tutorial-step">
+                    <div class="step-number">4</div>
+                    <div class="step-title" id="tutStep4Title"><span class="step-icon">📝</span> Report</div>
+                    <div class="step-desc" id="tutStep4Desc">When reporting a threat, pick the <strong>correct threat type</strong> to earn <strong>+10 Wisdom</strong>. Wrong category still blocks the threat but gives only +3 Wisdom.</div>
+                </div>
+            </div>
+
+            <div class="tutorial-decisions">
+                <div class="tutorial-decisions-title" id="tutDecisionsTitle">DECISION GUIDE</div>
+                <div class="decision-guide-grid">
+                    <div class="decision-guide-card">
+                        <div class="decision-guide-icon">🟢</div>
+                        <div>
+                            <span class="decision-guide-label" id="tutGuideAllowLabel">ALLOW / OPEN</span>
+                            <span class="decision-guide-text" id="tutGuideAllowText">Use when all tools show VALID / MATCH results. Boosts Economy +5%.</span>
+                        </div>
+                    </div>
+                    <div class="decision-guide-card">
+                        <div class="decision-guide-icon">🔵</div>
+                        <div>
+                            <span class="decision-guide-label" id="tutGuideVerifyLabel">TRUST & VERIFY</span>
+                            <span class="decision-guide-text" id="tutGuideVerifyText">Sends to quarantine sandbox for a deep scan. Safe option when unsure.</span>
+                        </div>
+                    </div>
+                    <div class="decision-guide-card">
+                        <div class="decision-guide-icon">🔴</div>
+                        <div>
+                            <span class="decision-guide-label" id="tutGuideDenyLabel">DENY & REPORT</span>
+                            <span class="decision-guide-text" id="tutGuideDenyText">Block the threat and file a report. Pick correct type for max Wisdom (+10).</span>
+                        </div>
+                    </div>
+                    <div class="decision-guide-card">
+                        <div class="decision-guide-icon">🟠</div>
+                        <div>
+                            <span class="decision-guide-label" id="tutGuideBurnLabel">IGNORE & BURN</span>
+                            <span class="decision-guide-text" id="tutGuideBurnText">Destroy without reporting. Blocks threat but gives only +5 Wisdom.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="tutorial-close-btn" id="tutorialCloseBtn">BEGIN DUTY</button>
+        </div>
+    </div>
+
+    <!-- Background grid decoration -->
+    <div class="cyber-grid"></div>
+    <div class="cyber-scanlines"></div>
+
+    <div class="arcade-cabinet">
+        <!-- Cabinet top marquee header -->
+        <div class="cabinet-marquee">
+            <span class="glow-text-cyan medieval-title" id="marqueeTitle1">THE VIGILANT</span>
+            <span class="glow-text-magenta medieval-title" id="marqueeTitle2">SOVEREIGN</span>
+            <span class="marquee-subtitle" id="marqueeSubtitle">CYBER-DEFENSE REALM</span>
+        </div>
+
+        <!-- Main CRT Monitor Container -->
+        <div class="crt-monitor">
+            <div class="crt-screen">
+                <!-- Glitch and scanline overlays inside CRT -->
+                <div class="screen-scanlines"></div>
+                <div class="screen-flicker"></div>
+                <div class="screen-glare"></div>
+
+                <!-- HUD Bar -->
+                <div class="hud-bar">
+                    <div class="player-hud">
+                        <div class="hud-label" id="hudShieldLabel">KINGDOM SHIELD</div>
+                        <div class="player-hearts" id="playerHearts">
+                            <span class="heart active" id="heart1">❤️</span>
+                            <span class="heart active" id="heart2">❤️</span>
+                            <span class="heart active" id="heart3">❤️</span>
+                            <span class="heart active" id="heart4">❤️</span>
+                            <span class="heart active" id="heart5">❤️</span>
+                        </div>
+                    </div>
+                    
+                    <div class="system-status">
+                        <div class="status-indicator warning pulse" id="threatIndicator">GATE SECURITY: SECURE</div>
+                        <div class="status-code"><span id="wisdomLabel">WISDOM</span>: <span id="wisdomScore">0</span> // <span id="economyLabel">ECONOMY</span>: <span id="economyScore">100%</span></div>
+                    </div>
+
+                    <div class="level-hud">
+                        <div class="hud-label" id="hudLevelLabel">DEFENSE LEVEL</div>
+                        <div class="level-badge glow-text-cyan" id="levelVal">LEVEL 1</div>
+                    </div>
+                </div>
+
+                <!-- Canvas for battle animation -->
+                <div class="canvas-container">
+                    <div id="phaserGame"></div>
+                    
+                    <!-- Alert overlays overlaying the canvas (e.g. INTRUSION ALERT) -->
+                    <div id="intrusionAlert" class="canvas-overlay hidden">
+                        <div class="alert-box">
+                            <div class="alert-title blink" id="intrusionAlertTitle">⚠️ FIREWALL BREACH ALERT ⚠️</div>
+                            <div class="alert-message" id="alertMessage">MALWARE DETECTED IN THE CASTLE KEEP!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Splitter bar / terminal separator -->
+                <div class="terminal-divider">
+                    <div class="divider-line"></div>
+                    <div class="divider-dots"></div>
+                </div>
+
+                <!-- Quiz and Text terminal area -->
+                <div class="terminal-area">
+                    <!-- Start/Intro State -->
+                    <div id="introScreen" class="terminal-content">
+                        <h2 class="terminal-title glow-text-cyan" id="introTitle">DEFEND THE SOVEREIGN REALM!</h2>
+                        <p class="terminal-text" id="introText">
+                            Welcome, Royal Security Officer. Suspicious caravans are approaching the castle gates.
+                            Each caravan represents a **Data Packet** attempting to enter the kingdom's network.
+                            Inspect them using your **Security Tools**, then make your decision. 
+                            Block threats, protect the Economy from false alarms, and gain Wisdom to secure the realm.
+                        </p>
+                        <div class="btn-group">
+                            <button id="startBtn" class="arcade-btn green-btn">BOOT REALM PROTOCOLS</button>
+                        </div>
+                    </div>
+
+                    <!-- Audit Mode State (Split Screen Panel) -->
+                    <div id="auditScreen" class="terminal-content hidden">
+                        <!-- Caravan Progress Badge -->
+                        <div class="caravan-progress-badge" id="caravanProgressBadge">
+                            <span id="progressLabel">CARAVAN</span>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill" id="progressBarFill" style="width: 0%"></div>
+                            </div>
+                            <span class="progress-text" id="progressText">1/5</span>
+                        </div>
+                        <div class="audit-container">
+                            <!-- Left: Caravan Profile Scroll -->
+                            <div class="parchment-scroll">
+                                <div class="scroll-header">
+                                    <span class="scroll-title" id="caravanTitle">Caravan Profile</span>
+                                    <span class="scroll-subtitle" id="caravanType">Foreign Merchant</span>
+                                </div>
+                                <div class="scroll-content">
+                                     <div class="profile-row">
+                                        <span class="profile-label" id="labelSender">Claimed Sender:</span>
+                                        <span class="profile-value" id="profileSender">Loading...</span>
+                                    </div>
+                                    <div class="profile-row">
+                                        <span class="profile-label" id="labelRoute">Trade Route:</span>
+                                        <span class="profile-value" id="profileRoute">Loading...</span>
+                                    </div>
+                                    <div class="profile-row">
+                                        <span class="profile-label" id="labelSeal">Seal of Authenticity:</span>
+                                        <span class="profile-value" id="profileSeal">Loading...</span>
+                                    </div>
+                                    <div class="profile-row">
+                                        <span class="profile-label" id="labelWeight">Cargo Weight:</span>
+                                        <span class="profile-value" id="profileWeight">Loading...</span>
+                                    </div>
+                                    <!-- Inspected Data Section -->
+                                    <div class="inspection-results" id="inspectionResults">
+                                         <div id="truthLensReadout" class="readout-item hidden">
+                                            <span class="readout-label" id="labelLens">[LENS] Real Source:</span>
+                                            <span class="readout-value" id="lensValue">Unresolved</span>
+                                        </div>
+                                        <div id="magicScaleReadout" class="readout-item hidden">
+                                            <span class="readout-label" id="labelScale">[SCALE] Real Size / Format:</span>
+                                            <span class="readout-value" id="scaleValue">Unresolved</span>
+                                        </div>
+                                        <div id="cryptographerReadout" class="readout-item hidden">
+                                            <span class="readout-label" id="labelCrypto">[CRYPTO] Signature Integrity:</span>
+                                            <span class="readout-value" id="cryptoValue">Unresolved</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                             <!-- Right: Tools and Decisions -->
+                            <div class="audit-controls">
+                                <div class="section-title" id="titleTools">ACTIVE SECURITY TOOLS</div>
+                                <div class="tools-grid">
+                                    <button class="tool-btn" id="toolLens" data-tool="lens">
+                                        <span class="tool-icon">🔍</span>
+                                        <span class="tool-name" id="nameLens">Truth Lens</span>
+                                    </button>
+                                    <button class="tool-btn" id="toolScale" data-tool="scale">
+                                        <span class="tool-icon">⚖️</span>
+                                        <span class="tool-name" id="nameScale">Magic Scale</span>
+                                    </button>
+                                    <button class="tool-btn" id="toolCrypto" data-tool="crypto">
+                                        <span class="tool-icon">🔏</span>
+                                        <span class="tool-name" id="nameCrypto">Cryptographer</span>
+                                    </button>
+                                    <button class="tool-btn" id="toolCage" data-tool="cage">
+                                        <span class="tool-icon">🕸️</span>
+                                        <span class="tool-name" id="nameCage">Quarantine Cage</span>
+                                    </button>
+                                </div>
+
+                                <div class="section-title" id="titleDecision">SOVEREIGN DECISION</div>
+                                <div class="decisions-grid">
+                                    <div class="decision-btn-wrapper">
+                                        <div class="decision-tooltip" id="tooltipAllow"><span class="tip-hint">✅ SAFE CARAVAN</span>Use when all tools show VALID / MATCH results</div>
+                                        <button class="action-btn green-btn" id="btnAllow">ALLOW / OPEN</button>
+                                    </div>
+                                    <div class="decision-btn-wrapper">
+                                        <div class="decision-tooltip" id="tooltipVerify"><span class="tip-hint">🔬 UNSURE?</span>Sends to quarantine for a deep sandbox scan</div>
+                                        <button class="action-btn blue-btn" id="btnVerify">TRUST & VERIFY</button>
+                                    </div>
+                                    <div class="decision-btn-wrapper">
+                                        <div class="decision-tooltip" id="tooltipArrest"><span class="tip-hint">🚨 THREAT FOUND</span>Block & report — pick the correct threat type for +10 Wisdom</div>
+                                        <button class="action-btn red-btn" id="btnArrest">DENY & REPORT</button>
+                                    </div>
+                                    <div class="decision-btn-wrapper">
+                                        <div class="decision-tooltip" id="tooltipBurn"><span class="tip-hint">🔥 QUICK DESTROY</span>Incinerate without report — only +5 Wisdom</div>
+                                        <button class="action-btn orange-btn" id="btnBurn">IGNORE & BURN</button>
+                                    </div>
+                                </div>
+                                <!-- Key Tips Banner -->
+                                <div class="key-tips-banner" id="keyTipsBanner">
+                                    <span class="tip-icon">💡</span>
+                                    <span id="keyTipsText">Tip: Look for MISMATCH in sender or EXTERNAL routes — those are threats!</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Threat Selector Overlay Modal -->
+                    <div id="threatSelectModal" class="terminal-content hidden">
+                        <div class="threat-modal-box">
+                            <h3 class="modal-title glow-text-red">REPORTING SECURITY THREAT</h3>
+                            <p class="modal-desc">Identify the precise vector of this attack to file correct report details with the High Council:</p>
+                            <div class="threat-options-grid" id="threatOptions">
+                                <!-- Dynamically generated threat options -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Answer Feedback state -->
+                    <div id="feedbackScreen" class="terminal-content hidden">
+                        <h2 id="feedbackTitle" class="feedback-title glow-text-green">DECISION RECORDED</h2>
+                        <p id="feedbackText" class="feedback-text">Applying cyber security counter-measures...</p>
+                        <div class="btn-group">
+                            <button id="nextBtn" class="arcade-btn blue-btn">CONTINUE DUTY</button>
+                        </div>
+                    </div>
+
+                    <!-- Game Over State (Lose) -->
+                    <div id="gameOverScreen" class="terminal-content hidden">
+                        <h2 class="terminal-title glow-text-red blink" id="failTitle">THE KINGDOM HAS FALLEN!</h2>
+                        <p class="terminal-text text-red" id="postMortemText">
+                            Critical failure. The kingdom was compromised by malicious malware.
+                        </p>
+                        <div class="btn-group">
+                            <button id="retryBtn" class="arcade-btn red-btn">REBOOT REALM (RETRY)</button>
+                        </div>
+                    </div>
+
+                    <!-- Victory State (Win) -->
+                    <div id="victoryScreen" class="terminal-content hidden">
+                        <h2 class="terminal-title glow-text-green" id="victoryTitle">THE REALM IS SECURED!</h2>
+                        <p class="terminal-text text-green" id="victoryText">
+                            All caravans have been inspected. The kingdom stands secure against modern cyber threats!
+                        </p>
+                        <div class="victory-stats" id="victoryStatsSummary">
+                            <!-- Stats summary goes here -->
+                        </div>
+                        <div class="btn-group">
+                            <button id="restartBtn" class="arcade-btn green-btn">REPLAY DUTY PROTOCOLS</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <!-- Arcade Control Deck (Settings) -->
+        <div class="arcade-controls">
+            <div class="control-group">
+                <span class="control-label" id="labelSound">SOUND</span>
+                <button id="audioToggleBtn" class="control-btn toggle-active">ON</button>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label" id="labelTheme">THEME</span>
+                <button id="themeToggleBtn" class="control-btn toggle-active">NEON REALM</button>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label" id="labelLang">LANGUAGE</span>
+                <button id="langToggleBtn" class="control-btn">EN</button>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label" id="labelGuards">GUARDS</span>
+                <div class="arcade-joystick">
+                    <div class="joystick-stick"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <button class="help-btn" id="helpBtn" title="How to Play">❓</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="game.js"></script>
+</body>
+</html>
